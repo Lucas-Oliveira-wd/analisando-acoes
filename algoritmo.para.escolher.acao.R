@@ -1,7 +1,7 @@
 #Importar os dados do excel
 #carregar biblioteca
 library(readxl)
-setwd("G:/Meu Drive/financas/investimentos/acoes/")
+setwd("C:/files/projects/programacao/R/analisando-acoes")
 acoes <- read_excel("G:/Meu Drive/financas/investimentos/acoes/acoes.xlsm", 
                     col_types = c("text", "text", "date", 
                                   "text", "numeric", "numeric", "numeric", 
@@ -80,61 +80,26 @@ for(i in acoes[,"Codigo"]){
   cod = c(cod,i)
 }
 #Criando ranking para atribuir pontos empresas
-rank.ac = data.frame(1.5*rank(-p.l),1.2*rank(-p.vpa),rank(roe),rank(roic),
-                     1.2*rank(-p.cxa), rank(-divbr.p),rank(-divbr.cx),
-                     rank(marg.ebit),rank(marg.liq),1.3*rank(cres.rec),
-                     1.2*rank(div.yeld),1.2*rank(lynch),
-                     0.8*rank(per.resist),1.2*rank(-div.Lucm),
-                     rank(-desv.pad) , row.names = cod)
+rank.ac = data.frame(rank(-p.l), rank(-p.vpa), rank(roe), rank(roic),
+                     rank(-p.cxa), rank(-divbr.p), rank(-divbr.cx),
+                     rank(marg.ebit), rank(marg.liq), rank(cres.rec),
+                     rank(div.yeld), rank(lynch),
+                     rank(per.resist), rank(-div.Lucm),
+                     rank(-desv.pad), row.names = cod)
 
-#colocando os valores em vetores
-ep1 = sum(rank.ac[1,])
-ep2 = sum(rank.ac[2,])
-ep3 = sum(rank.ac[3,])
-ep4 = sum(rank.ac[4,])
-ep5 = sum(rank.ac[5,])
-ep6 = sum(rank.ac[6,])
-ep7 = sum(rank.ac[7,])
-ep8 = sum(rank.ac[8,])
-ep9 = sum(rank.ac[9,])
-ep10 = sum(rank.ac[10,])
-ep11 = sum(rank.ac[11,])
-ep12 = sum(rank.ac[12,])
-ep13 = sum(rank.ac[13,])
-ep14 = sum(rank.ac[14,])
-ep15 = sum(rank.ac[15,])
-ep16 = sum(rank.ac[16,])
-ep17 = sum(rank.ac[17,])
-ep18 = sum(rank.ac[18,])
-ep19 = sum(rank.ac[19,])
-ep20 = sum(rank.ac[20,])
-ep21 = sum(rank.ac[21,])
-ep22 = sum(rank.ac[22,])
-ep23 = sum(rank.ac[23,])
-ep24 = sum(rank.ac[24,])
-ep25 = sum(rank.ac[25,])
-ep26 = sum(rank.ac[26,])
-ep27 = sum(rank.ac[27,])
-ep28 = sum(rank.ac[28,])
-ep29 = sum(rank.ac[29,])
-ep30 = sum(rank.ac[30,])
-ep31 = sum(rank.ac[31,])
-ep32 = sum(rank.ac[32,])
-ep33 = sum(rank.ac[33,])
-ep34 = sum(rank.ac[34,])
-ep35 = sum(rank.ac[35,])
-ep36 = sum(rank.ac[36,])
-ep37 = sum(rank.ac[37,])
-ep38 = sum(rank.ac[38,])
-ep39 = sum(rank.ac[39,])
-ep40 = sum(rank.ac[40,])
+#colocando a som dos pontos em um vetor
+res = c()
+for (i in 1:500) {
+  if (is.na(sum(rank.ac[i,]))){
+  }
+  else{
+    res = c(res,sum(rank.ac[i,]))
+  }
+}
 
-#Colocando os valores em um vetor
-res = c(ep1,ep2,ep3,ep4,ep5,ep6,ep7,ep8,ep9,ep10,ep11,ep12,ep13,ep14,ep15,ep16,
-        ep17,ep18,ep19,ep20,ep21,ep22,ep23,ep24,ep25,ep26,ep27,ep28,ep29,ep30,
-        ep31,ep32,ep33,ep34,ep35,ep36,ep37,ep38,ep39,ep40)
 #Ordenando o vetor
 ord = order(res,na.last = NA,decreasing = T)
+
 #retirando as 7 melhores empresas
 best7=c()
 for (i in ord) {
@@ -211,32 +176,17 @@ for(i in bancos[,"Codigo"]){
 rank.ac = data.frame(rank(-p.l),rank(-p.vpa),rank(roe),rank(-p.at.a),
                      rank(cres.rec),
                      rank(div.yeld),rank(lynch),row.names = cod)
-ep1 = sum(rank.ac[1,])
-ep2 = sum(rank.ac[2,])
-ep3 = sum(rank.ac[3,])
-ep4 = sum(rank.ac[4,])
-ep5 = sum(rank.ac[5,])
-ep6 = sum(rank.ac[6,])
-ep7 = sum(rank.ac[7,])
-ep8 = sum(rank.ac[8,])
-ep9 = sum(rank.ac[9,])
-ep10 = sum(rank.ac[10,])
-ep11 = sum(rank.ac[11,])
-ep12 = sum(rank.ac[12,])
-ep13 = sum(rank.ac[13,])
-ep14 = sum(rank.ac[14,])
-ep15 = sum(rank.ac[15,])
-ep16 = sum(rank.ac[16,])
-ep17 = sum(rank.ac[17,])
-ep18 = sum(rank.ac[18,])
-ep19 = sum(rank.ac[19,])
-ep20 = sum(rank.ac[20,])
-ep21 = sum(rank.ac[21,])
-ep22 = sum(rank.ac[22,])
 
-#Colocando os valores em um vetor
-res = c(ep1,ep2,ep3,ep4,ep5,ep6,ep7,ep8,ep9,ep10,ep11,ep12,ep13,ep14,ep15,ep16,
-        ep17,ep18,ep19,ep20,ep21,ep22)
+#colocando a som dos pontos em um vetor
+res = c()
+for (i in 1:500) {
+  if (is.na(sum(rank.ac[i,]))){
+  }
+  else{
+    res = c(res,sum(rank.ac[i,]))
+  }
+}
+
 #Ordenando o vetor
 ord = order(res,na.last = NA,decreasing = T)
 #retirando o melhor banco
