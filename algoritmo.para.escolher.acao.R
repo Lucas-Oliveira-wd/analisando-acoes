@@ -40,10 +40,10 @@ ativ = patl = recl12 = ebit12 = Lucl12 = recl3 = c()
 
 ult_cot_t = cotAtual_t = divY_t = c()
 for (i in 1:length(df_tri[,"ultBal"])){
-  if (df_tri[i,"ultBal"] == "2022-09-30"){
+  if (df_tri[i,"ultBal"] == "2023-03-31"){
     j = match(df_tri[i,"codigo"], cod)
     ult_cot_t = c(ult_cot_t, ult_cot[j])
-    cotAtual_t = c(cotAtual_t, cotAtual[j])
+    cotAtu(cotAtual_t = cal_t, cotAtual[j])
     ult_bal =  c(ult_bal, df_tri[i,"ultBal"])
     codigo = c(codigo, df_tri[i,"codigo"])
     roic = c(roic, df_tri[i,"roic"])
@@ -80,13 +80,6 @@ df_tri_3t22 = data.frame(ult_cot_t, cotAtual_t, ult_bal, codigo, roic, cres_rec5
                          ativc, ativ, patl, recl12, ebit12, Lucl12, recl3,
                          row.names = codigo)
 
-for (c in 1:length(df_tri_3t22[1,])){
-  for (r in 1:length(df_tri_3t22[,1])){
-    if (df_tri_3t22[r,c]<0){
-      print(c(row.names(df_tri_3t22)[r],colnames(df_tri_3t22)[c]))
-    }
-  }
-}
 
 #gridExtra::grid.table(df_tri_3t22 %>% slice(1:20))
 
@@ -107,13 +100,31 @@ divY_t = round(divY_t, 2)
 lynch = round((divY_t+(cres_rec5/5))/pl, 2)
 div_lucm = round(divb/(Lucl12/12), 2)
 
-#Criando ranking para atribuir pontos empresas
-rank.ac = data.frame(rank(-pl), rank(-pv), rank(roe), rank(roic),
-                     rank(-p_cxa), rank(-p_ativc), rank(-p_ativ),
-                     rank(-divbr_p), rank(-div_cxa),
-                     rank(marg_ebit), rank(marg_liq), rank(cres_rec5),
-                     rank(divY_t), rank(lynch), rank(-div_lucm),
-                     row.names = codigo)
+crit = data.frame(pl ,pv ,roe ,roic ,p_cxa ,p_ativc ,p_ativ , div_cxa,
+                  marg_ebit ,marg_liq ,cres_rec5 ,divY_t ,lynch,
+                  div_lucm, row.names = codigo)
+
+colnames(crit) = c("P/L", "P/VPA",
+                   "ROE",
+                   "ROIC",
+                   "Preço/(Caixa/Ação)", "Preço/(Ativos Circulantes/Ação)",
+                   "Preço/(Ativos/Ação)", "Dív Bruta/Caixa", "Mar. EBITDA",
+                   "Marg. Líquida", "Cresc. Rec. (5 Anos)",
+                   "Dividendyield", "Lynch",
+                   "Dív. Bruta/Lucro Mensal")
+
+
+rmv_inf_values_row = function(df){
+  for (r in 1:length(df[,1])){
+    if (is.na(match(Inf, df[r,])) || is.na(match(Inf, df[r,]))){
+      
+    } else {
+      df = df[-r,]
+    }
+    
+  }
+  return(df)
+}
 
 rmv_neg_pl = function(df){
   pl_neg = c()
@@ -154,7 +165,76 @@ rmv_neg_pvpa = function(df){
   return(df)
 }
 
-res = rmv_neg_pl(res)
+emp_lucpat_neg = c()
+for(r in 1:length(df_tri_3t22[,1])){
+  if(df_tri_3t22[r,'Lucl12'] < 0 && df_tri_3t22[r,'patl'] < 0){
+    emp_lucpat_neg = c(emp_lucpat_neg, df_tri_3t22[r, 'codigo'])
+  }
+}
+
+roe_err = c()
+for (r in emp_lucpat_neg){
+  roe_err = c(roe_err,(df_tri_3t22[r,"Lucl12"]/df_tri_3t22[r,'patl'])*100)
+}
+
+emp_lucpat_neg = c()
+for(r in 1:length(df_tri_3t22[,1])){
+  if(df_tri_3t22[r,'Lucl12'] < 0 && df_tri_3t22[r,'patl'] < 0){
+    emp_lucpat_neg = c(emp_lucpat_neg, df_tri_3t22[r, 'codigo'])
+  }
+}
+
+
+#Criando ranking para atribuir pontos empresas
+rank.ac = data.frame(rank(-pl), rank(-pv), rank(roe), rank(roic),
+                     rank(-p_cxa), rank(-p_ativc), rank(-p_ativ),
+                     rank(-divbr_p), rank(-div_cxa),
+                     rank(marg_ebit), rank(marg_liq), rank(cres_rec5),
+                     rank(divY_t), rank(lynch), rank(-div_lucm),
+                     row.names = codigo)
+
+view(rank.ac)
+
+rmv_neg_pl = function(df){
+  pl_neg = c()
+  col_i = match("P/L",colnames(df))
+  len = length(df[,col_i])
+  for (r in 1:len){
+    if (!is.na(df[r,col_i])){
+      if (df[r,col_i] < 0){
+        pl_neg = c(pl_neg,(df[r,"P/L"]))
+      }
+    }
+  }
+  
+  for (i in pl_neg) {
+    if (i %in% df[,col_i]){
+      df = df[-match(i,df[,col_i]),]
+    }
+  }
+  return(df)
+}
+
+rmv_neg_pvpa = function(df){
+  pvpa_neg = c()
+  col_i = match("P/VPA",colnames(df))
+  len = length(df[,col_i])
+  for (r in 1:len){
+    if (!is.na(df[r,col_i])){
+      if (df[r,col_i] < 0){
+        pvpa_neg = c(pvpa_neg,df[r,"P/VPA"])
+      }
+    }
+  }
+  for (i in pvpa_neg) {
+    if (i %in% df[,col_i]){
+      df = df[-match(i,df[,col_i]),]
+    }
+  }
+  return(df)
+}
+
+res = rmv_neg_pl(rank.ac)
 length(crit[,1])
 res = rmv_neg_pvpa(res)
 length(crit[,1])
